@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: client1-dev
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-client1-dev-whoami
+  namespace: client1-dev
+spec:
+  selector:
+    matchLabels:
+      app: webapp-client1-dev-whoami
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp-client1-dev-whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-client1-dev-whoami
+  namespace: client1-dev
+spec:
+  selector:
+    app: webapp-client1-dev-whoami
+  ports:
+    - port: 7070
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-client1-dev-ingress
+  namespace: client1-dev
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: client1.dev.azuredemo.es
+    http:
+      paths:
+      - path: /(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-client1-dev-whoami
+            port:
+              number: 7070

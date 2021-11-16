@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: client2-qa
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-client2-qa-whoami
+  namespace: client2-qa
+spec:
+  selector:
+    matchLabels:
+      app: webapp-client2-qa-whoami
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp-client2-qa-whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-client2-qa-whoami
+  namespace: client2-qa
+spec:
+  selector:
+    app: webapp-client2-qa-whoami
+  ports:
+    - port: 8080
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-client2-qa-ingress
+  namespace: client2-qa
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: client2.qa.azuredemo.es
+    http:
+      paths:
+      - path: /(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-client2-qa-whoami
+            port:
+              number: 8080

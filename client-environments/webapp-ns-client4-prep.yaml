@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: client4-prep
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-client4-prep-whoami
+  namespace: client4-prep
+spec:
+  selector:
+    matchLabels:
+      app: webapp-client4-prep-whoami
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp-client4-prep-whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-client4-prep-whoami
+  namespace: client4-prep
+spec:
+  selector:
+    app: webapp-client4-prep-whoami
+  ports:
+    - port: 9090
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-client4-prep-ingress
+  namespace: client4-prep
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: client4.prep.azuredemo.es
+    http:
+      paths:
+      - path: /(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-client4-prep-whoami
+            port:
+              number: 9090

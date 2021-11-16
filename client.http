@@ -1,0 +1,19 @@
+###
+
+GET http://client1.dev.azuredemo.es HTTP/1.1
+
+###
+
+GET http://client2.qa.azuredemo.es HTTP/1.1
+
+###
+
+GET http://client3.prep.azuredemo.es HTTP/1.1
+
+###
+
+GET http://client4.prep.azuredemo.es HTTP/1.1
+
+###
+
+GET http://client5.qa.azuredemo.es HTTP/1.1
