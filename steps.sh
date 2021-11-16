@@ -93,7 +93,7 @@ az network application-gateway address-pool create \
 --name nginx-controller-pool \
 --servers $INTERNAL_LOAD_BALANCER_IP_FOR_NGINX_INGRESS
 
-# Now add listener, using wildcards, that points to the Nginx Controller Ip and routes to the proper web app
+# Now add listener, using wildcard, that points to the Nginx Controller Ip and routes to the proper web app
 az network application-gateway http-listener create \
   --name aks-ingress-listener \
   --frontend-ip appGatewayFrontendIP \
@@ -126,9 +126,6 @@ az network application-gateway http-settings update \
 --name "appGatewayBackendHttpSettings" \
 --resource-group $RESOURCE_GROUP \
 --probe "probe-azuredemo-es"
-
-#Install more clients to see if we can resolve it
-kubectl apply -f more-clients/.
 
 #See all ingress configured
 kubectl get ingress --all-namespaces
