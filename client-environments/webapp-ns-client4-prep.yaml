@@ -47,16 +47,13 @@ metadata:
   name: webapp-client4-prep-ingress
   namespace: client4-prep
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: nginx    
 spec:
   rules:
   - host: client4.prep.azuredemo.es
     http:
       paths:
-      - path: /(/|$)(.*)
+      - path: /
         pathType: Prefix
         backend:
           service:
